@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NYT Top Stories</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f8f8f8;
+    }
+    h1 {
+      text-align: center;
+    }
+    .news-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .news-card {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .news-card img {
+      max-width: 100%;
+      border-radius: 5px;
+    }
+    .news-card h3 {
+      margin-top: 10px;
+    }
+    .news-card a {
+      text-decoration: none;
+      color: #0044cc;
+    }
+    .news-card p {
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>🗞️ New York Times - Top Stories</h1>
+  <div class="news-container" id="newsContainer">Loading news...</div>
+
+  <script>
+    const apiKey = 'https://api.nytimes.com/svc/topstories/v2/{section}.json'; 
+    const section = 'home'; // other options: 'world', 'science', 'technology', etc.
+    const newsContainer = document.getElementById('newsContainer');
+
+    async function fetchNYTNews() {
+      try {
+        const response = await fetch(`https://api.nytimes.com/svc/topstories/v2/${section}.json?api-key=${apiKey}`);
+        const data = await response.json();
+
+        newsContainer.innerHTML = '';
+
+        data.results.slice(0, 12).forEach(article => {
+          const card = document.createElement('div');
+          card.className = 'news-card';
+
+          const image = article.multimedia?.[0]?.url || '';
+          card.innerHTML = `
+            ${image ? `<img src="${image}" alt="News Image">` : ''}
+            <h3><a href="${article.url}" target="_blank">${article.title}</a></h3>
+            <p>${article.abstract}</p>
+          `;
+
+          newsContainer.appendChild(card);
+        });
+      } catch (error) {
+        newsContainer.innerHTML = 'Failed to load news: ' + error.message;
+      }
+    }
+
+    fetchNYTNews();
+  </script>
+</body>
+</html>
